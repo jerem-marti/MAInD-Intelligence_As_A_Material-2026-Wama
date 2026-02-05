@@ -1,6 +1,6 @@
 # MAInD Wama - Smart Sink Companion
 
-A merged project combining ML-powered state detection with beautiful Lottie animations for an interactive sink companion experience.
+An interactive sink companion that uses ML-powered state detection and gesture recognition to provide a friendly, animated presence during everyday tasks at the sink.
 
 ## Features
 
