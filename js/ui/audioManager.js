@@ -23,7 +23,8 @@ class AudioManager {
             hello: document.getElementById('audio-hello'),
             howareyou: document.getElementById('audio-howareyou'),
             bye: document.getElementById('audio-bye'),
-            worried: document.getElementById('audio-worried')
+            worried: document.getElementById('audio-worried'),
+            youreback: document.getElementById('audio-youreback')
         };
 
         // Set up ended event listeners
@@ -83,6 +84,12 @@ class AudioManager {
      */
     playForRoute(routeConfig) {
         if (!routeConfig.audio) {
+            // Stop askmusic when leaving its page (even though it loops)
+            const currentAudioName = this.currentAudio ? this.getAudioName(this.currentAudio) : null;
+            if (currentAudioName === 'askmusic') {
+                this.stop();
+                return;
+            }
             // Don't stop looping audio (music, worried) when navigating to routes without audio
             // Only stop non-looping audio
             if (this.currentAudio && !this.currentAudio.loop) {
@@ -94,8 +101,14 @@ class AudioManager {
         // Extract audio name from element ID
         const audioName = routeConfig.audio.replace('audio-', '');
         
-        // Determine if it should loop (background music)
-        const loopingAudio = ['worried', 'music'];
+        // Stop askmusic if navigating to a different audio route
+        const currentAudioName = this.currentAudio ? this.getAudioName(this.currentAudio) : null;
+        if (currentAudioName === 'askmusic' && audioName !== 'askmusic') {
+            this.stop();
+        }
+        
+        // Determine if it should loop (background music and askmusic)
+        const loopingAudio = ['worried', 'music', 'askmusic'];
         const shouldLoop = loopingAudio.includes(audioName);
 
         console.log(`Playing audio: ${audioName}, loop: ${shouldLoop}`);

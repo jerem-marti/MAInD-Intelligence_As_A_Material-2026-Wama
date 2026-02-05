@@ -107,6 +107,9 @@ class DebugPanel {
 
         const currentClass = appState.get('currentClass');
 
+        // Debug: log predictions to see structure
+        console.log('Predictions:', predictions.map(p => `${p.className}: ${(p.probability * 100).toFixed(1)}%`).join(', '));
+
         for (let i = 0; i < predictions.length; i++) {
             const prob = predictions[i].probability;
             const fillEl = document.getElementById(`prob-fill-${i}`);
@@ -123,7 +126,7 @@ class DebugPanel {
     /**
      * Update buffer votes display
      */
-    updateBufferVotes(voteCounts, bufferLength) {
+    updateBufferVotes(voteCounts, bufferLength, isStable) {
         if (!this.elements.bufferVotes || !voteCounts) return;
 
         const parts = [];
@@ -134,7 +137,8 @@ class DebugPanel {
             }
         }
 
-        this.elements.bufferVotes.textContent = parts.join(' | ') || '-';
+        const stabilityIcon = isStable ? '✓' : '~';
+        this.elements.bufferVotes.textContent = `${stabilityIcon} ${parts.join(' | ') || '-'}`;
     }
 
     /**

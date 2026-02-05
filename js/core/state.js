@@ -13,6 +13,7 @@ class AppState {
             handsDetector: null,
             webcam: null,
             isRunning: false,
+            detectionStartedOnce: false,
 
             // State detection
             currentClass: null,

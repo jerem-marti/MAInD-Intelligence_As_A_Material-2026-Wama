@@ -5,42 +5,45 @@
 
 import { EventBus } from '../core/eventBus.js';
 import { ROUTES } from '../config/routes.js';
+import { appState } from '../core/state.js';
 
 // Page templates
 const TEMPLATES = {
-    idle: () => `
-        <div class="page-content page-idle-content">
-            <div class="idle-message">
-                <p>Waiting for detection to start...</p>
-                <button id="btn-start-detection" class="btn btn-start">Start Detection</button>
+    idle: () => {
+        // Check if detection has been started before
+        const hasStartedBefore = appState.get('detectionStartedOnce');
+        
+        if (hasStartedBefore) {
+            // Return black/inactive screen
+            return `
+                <div class="page-content page-idle-content page-idle-inactive">
+                </div>
+            `;
+        }
+        
+        // First run - show start button
+        return `
+            <div class="page-content page-idle-content page-idle-firstrun">
+                <div class="idle-message">
+                    <p>Waiting for detection to start...</p>
+                    <button id="btn-start-detection" class="btn btn-start">Start Detection</button>
+                </div>
             </div>
-        </div>
-    `,
+        `;
+    },
 
     hello: () => `
         <div class="page-content page-hello-content">
-            <nav class="page-nav">
-                <a href="#howareyou" class="nav-link">How are you?</a>
-                <a href="#bye" class="nav-link">Go to bye</a>
-                <a href="#working" class="nav-link">Working</a>
-            </nav>
         </div>
     `,
 
     howareyou: () => `
         <div class="page-content page-howareyou-content">
-            <nav class="page-nav">
-                <a href="#hello" class="nav-link">Back to hello</a>
-            </nav>
         </div>
     `,
 
     working: () => `
         <div class="page-content page-working-content">
-            <nav class="page-nav">
-                <a href="#sessionfinished" class="nav-link">Session Finished?</a>
-                <a href="#hello" class="nav-link">Back to hello</a>
-            </nav>
         </div>
     `,
 
@@ -51,10 +54,6 @@ const TEMPLATES = {
                 <div id="gesture-countdown" class="gesture-countdown"></div>
                 <div id="hold-progress" class="hold-progress"></div>
             </div>
-            <nav class="page-nav">
-                <a href="#hello" class="nav-link">Back to hello</a>
-                <a href="#musicplaying" class="nav-link">Music Playing...</a>
-            </nav>
         </div>
     `,
 
@@ -62,43 +61,27 @@ const TEMPLATES = {
         <div class="page-content page-musicplaying-content">
             <div id="center-container"></div>
             <div id="corner-lottie"></div>
-            <nav class="page-nav">
-                <a href="#sessionfinished" class="nav-link">Session Finished?</a>
-                <a href="#hello" class="nav-link">Back to hello</a>
-            </nav>
+            <button id="btn-quit-music" class="btn btn-quit-music">Stop Music</button>
         </div>
     `,
 
     worried: () => `
         <div class="page-content page-worried-content">
-            <nav class="page-nav">
-                <a href="#youreback" class="nav-link">You're back</a>
-                <a href="#hello" class="nav-link">Back to hello</a>
-            </nav>
         </div>
     `,
 
     youreback: () => `
         <div class="page-content page-youreback-content">
-            <nav class="page-nav">
-                <a href="#hello" class="nav-link">Back to hello</a>
-            </nav>
         </div>
     `,
 
     bye: () => `
         <div class="page-content page-bye-content">
-            <nav class="page-nav">
-                <a href="#hello" class="nav-link">Back to hello</a>
-            </nav>
         </div>
     `,
 
     sessionfinished: () => `
         <div class="page-content page-sessionfinished-content">
-            <nav class="page-nav">
-                <a href="#hello" class="nav-link">Back to hello</a>
-            </nav>
         </div>
     `
 };
@@ -186,6 +169,11 @@ class PageRenderer {
         // Add new page class
         if (pageClass) {
             document.body.classList.add(pageClass);
+            
+            // Add inactive mode class for idle page when detection was started before
+            if (pageClass === 'page-idle' && appState.get('detectionStartedOnce')) {
+                document.body.classList.add('page-idle-inactive-mode');
+            }
         }
     }
 
@@ -200,6 +188,20 @@ class PageRenderer {
                     EventBus.emit('detection:start');
                 });
             }
+        }
+        
+        if (routeName === 'musicplaying') {
+            // Use setTimeout to ensure button exists after animation setup
+            setTimeout(() => {
+                const quitBtn = document.getElementById('btn-quit-music');
+                console.log('Binding quit button:', quitBtn);
+                if (quitBtn) {
+                    quitBtn.onclick = () => {
+                        console.log('Quit music button clicked');
+                        EventBus.emit('music:quit');
+                    };
+                }
+            }, 200);
         }
     }
 

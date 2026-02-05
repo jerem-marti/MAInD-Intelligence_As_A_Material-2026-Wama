@@ -106,9 +106,33 @@
                     <button class="debug-btn" onclick="document.getElementById('audio-askmusic').play()">❓ AskMusic</button>
                     <button class="debug-btn" onclick="document.getElementById('audio-hello').play()">👋 Hello</button>
                     <button class="debug-btn" onclick="document.getElementById('audio-howareyou').play()">🤔 HowAreYou</button>
+                    <button class="debug-btn" onclick="document.getElementById('audio-youreback').play()">🔙 YoureBack</button>
                     <button class="debug-btn" onclick="document.getElementById('audio-bye').play()">👋 Bye</button>
                     <button class="debug-btn" onclick="document.getElementById('audio-worried').play()">😟 Worried</button>
                     <button class="debug-btn" onclick="document.querySelectorAll('audio').forEach(a => { a.pause(); a.currentTime = 0; })">⏹️ Stop All</button>
+                </div>
+
+                <div class="debug-section-title">🎮 Simulation Mode</div>
+                <div class="debug-grid">
+                    <div class="debug-item" style="grid-column: span 2;">
+                        <label>
+                            <input type="checkbox" id="debug-simulation-mode" onchange="window.debugSimulation?.toggleSimulation(this.checked)">
+                            <span class="debug-label">Enable Simulation (Override ML)</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="debug-audio-buttons" style="margin-top: 8px;">
+                    <span class="debug-label" style="width: 100%; margin-bottom: 4px;">Fake ML Class:</span>
+                    <button class="debug-btn sim-btn" onclick="window.debugSimulation?.setClass(1)">C1 Idle</button>
+                    <button class="debug-btn sim-btn" onclick="window.debugSimulation?.setClass(2)">C2 Person</button>
+                    <button class="debug-btn sim-btn" onclick="window.debugSimulation?.setClass(3)">C3 Task</button>
+                    <button class="debug-btn sim-btn" onclick="window.debugSimulation?.setClass(4)">C4 Interrupt</button>
+                </div>
+                <div class="debug-audio-buttons" style="margin-top: 8px;">
+                    <span class="debug-label" style="width: 100%; margin-bottom: 4px;">Fake Gesture:</span>
+                    <button class="debug-btn sim-btn" onclick="window.debugSimulation?.setGesture('thumbs_up')">👍 Thumbs Up</button>
+                    <button class="debug-btn sim-btn" onclick="window.debugSimulation?.setGesture('thumbs_down')">👎 Thumbs Down</button>
+                    <button class="debug-btn sim-btn" onclick="window.debugSimulation?.setGesture(null)">✋ No Gesture</button>
                 </div>
             </div>
         </details>
@@ -125,6 +149,7 @@
     <audio id="audio-howareyou" src="https://cdn.pixabay.com/audio/2025/09/18/audio_37de472eec.mp3" preload="auto"></audio>
     <audio id="audio-bye" src="https://cdn.pixabay.com/audio/2023/09/30/audio_b3d6b91910.mp3" preload="auto"></audio>
     <audio id="audio-worried" src="https://cdn.pixabay.com/audio/2024/10/25/audio_66d1f8e5fd.mp3" preload="auto" loop></audio>
+    <audio id="audio-youreback" src="https://cdn.pixabay.com/audio/2025/05/29/audio_145c0e7b22.mp3" preload="auto"></audio>
 
     <!-- Hidden Webcam Container (for ML processing) -->
     <div id="webcam-container" class="webcam-hidden"></div>

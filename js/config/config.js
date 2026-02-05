@@ -15,10 +15,11 @@ export const CONFIG = {
     flipWebcam: true,
 
     // State detection settings
-    stateDebounceMs: 300,
-    predictionBufferSize: 10,
-    majorityThreshold: 0.6,
-    minConfidenceThreshold: 0.55,
+    stateDebounceMs: 500,           // Minimum time between state changes
+    predictionBufferSize: 15,       // Number of predictions to buffer
+    majorityThreshold: 0.6,         // 60% of votes needed for state change
+    minConfidenceThreshold: 0.55,   // Minimum confidence for a prediction to count
+    stabilityFrames: 5,             // Consecutive frames needed for critical states (Class 4)
 
     // ==========================================================================
     // MediaPipe Hands Settings

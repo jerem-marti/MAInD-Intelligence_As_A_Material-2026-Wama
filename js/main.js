@@ -13,6 +13,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('MAInD Wama - Smart Sink Companion');
     console.log('================================');
     
+    // Always start at idle route on page load/reload
+    if (window.location.hash !== '#idle' && window.location.hash !== '') {
+        window.location.hash = 'idle';
+    } else if (window.location.hash === '') {
+        window.location.hash = 'idle';
+    }
+    
     try {
         await appController.initialize();
     } catch (error) {

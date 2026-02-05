@@ -59,7 +59,7 @@ export const ROUTES = {
         title: 'Oh! You\'re back now!',
         pageClass: 'page-youreback',
         lottie: { path: 'assets/animations/youreback.svg', loop: false, delay: 1000, isSvg: true },
-        audio: null,
+        audio: 'audio-youreback',
         template: 'youreback'
     },
     'bye': {

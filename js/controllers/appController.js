@@ -21,6 +21,7 @@ import { pageRenderer } from '../ui/pageRenderer.js';
 import { animationManager } from '../ui/animationManager.js';
 import { audioManager } from '../ui/audioManager.js';
 import { debugPanel } from '../ui/debugPanel.js';
+import { debugSimulation } from '../ui/debugSimulation.js';
 
 // =============================================================================
 // FLOW STATES (matching flowchart)
@@ -39,9 +40,9 @@ const FLOW_STATE = {
 
 // Timing thresholds (from flowchart)
 const TIMING = {
-    INACTIVITY_TIMEOUT: 5000,       // 5 sec without activity → sleep
+    INACTIVITY_TIMEOUT: 2000,       // 2 sec without activity → sleep
     LONG_TASK_THRESHOLD: 20000,     // 20 sec for long task scenario
-    MUSIC_COOLDOWN: 120000,         // 2 min before asking music again
+    MUSIC_COOLDOWN: 75000,         // 75 sec before asking music again
     GESTURE_TIMEOUT: 15000,         // 15 sec to respond to music question
     WORRY_DELAY: 5000,              // 5 sec before showing worry
     // SUDDEN_WAVE_CHECK: 5000,        // 5 sec sudden wave start check
@@ -71,6 +72,7 @@ class AppController {
         this.musicResponse = null;
         this.gestureDetectionActive = false;
         this.gestureStartTime = null;
+        this.wasMusicPlayingBeforeInterruption = false;
     }
 
     /**
@@ -122,6 +124,23 @@ class AppController {
         EventBus.on('detection:stop', () => {
             this.stopDetection();
         });
+
+        // Quit music mode
+        EventBus.on('music:quit', () => {
+            this.quitMusicMode();
+        });
+    }
+
+    /**
+     * Quit music mode and return to task
+     */
+    quitMusicMode() {
+        console.log('Quitting music mode');
+        audioManager.stop();
+        this.musicResponse = null;
+        // Reset the cooldown timer so user won't be asked again immediately
+        this.lastMusicAskTime = Date.now();
+        this.transitionTo(FLOW_STATE.TASK_ACTIVE);
     }
 
     /**
@@ -150,6 +169,12 @@ class AppController {
         console.log('Starting detection...');
 
         try {
+            // Request fullscreen mode
+            this.requestFullscreen();
+            
+            // Mark that detection has been started at least once
+            appState.set('detectionStartedOnce', true);
+            
             // Initialize ML models
             await Promise.all([
                 stateDetector.initialize(),
@@ -295,16 +320,39 @@ class AppController {
             case FLOW_STATE.INTERRUPTION:
                 // 5. Interruption - Person left, water still on
                 this.interruptionStartTime = now;
-                console.log('Interruption - Wama worried');
+                // Remember if music was playing before the interruption
+                this.wasMusicPlayingBeforeInterruption = (this.previousFlowState === FLOW_STATE.MUSIC_PLAYING);
+                console.log('Interruption - Wama worried, music was playing:', this.wasMusicPlayingBeforeInterruption);
                 break;
 
             case FLOW_STATE.RETURN_AFTER_ABSENCE:
                 // 6. Return After Absence - Relief
-                console.log('Person returned - Wama relieved: Oh, you\'re back!');
-                // After showing relief, go back to task
+                // Stop the howareyou audio when user comes back
+                audioManager.stop();
+                
+                // Add the interruption duration to thresholds (effectively pausing timers during absence)
+                const interruptionDuration = now - this.interruptionStartTime;
+                if (this.taskStartTime) {
+                    this.taskStartTime += interruptionDuration;
+                }
+                if (this.lastMusicAskTime) {
+                    this.lastMusicAskTime += interruptionDuration;
+                }
+                console.log(`Person returned after ${Math.floor(interruptionDuration / 1000)}s - Wama relieved: Oh, you're back!`);
+                
+                // Determine where to go after relief message
+                const shouldResumeMusic = this.wasMusicPlayingBeforeInterruption;
+                
+                // After showing relief, go back to task or music
                 setTimeout(() => {
                     if (this.flowState === FLOW_STATE.RETURN_AFTER_ABSENCE) {
-                        this.transitionTo(FLOW_STATE.TASK_ACTIVE);
+                        if (shouldResumeMusic) {
+                            // Resume music if it was playing before
+                            console.log('Resuming music after return');
+                            this.transitionTo(FLOW_STATE.MUSIC_PLAYING);
+                        } else {
+                            this.transitionTo(FLOW_STATE.TASK_ACTIVE);
+                        }
                     }
                 }, TIMING.RELIEF_DURATION);
                 break;
@@ -367,32 +415,63 @@ class AppController {
 
         const now = Date.now();
 
-        // Update webcam frame
-        stateDetector.updateFrame();
+        // Check if simulation mode is active
+        if (debugSimulation.isEnabled()) {
+            // Use simulated class directly
+            const simulatedClass = appState.get('currentClass') || 1;
+            
+            // Update debug display with fake data
+            const fakePredictions = [
+                { className: 'Class 1', probability: simulatedClass === 1 ? 0.95 : 0.01 },
+                { className: 'Class 2', probability: simulatedClass === 2 ? 0.95 : 0.01 },
+                { className: 'Class 3', probability: simulatedClass === 3 ? 0.95 : 0.01 },
+                { className: 'Class 4', probability: simulatedClass === 4 ? 0.95 : 0.01 }
+            ];
+            debugPanel.updateProbabilities(fakePredictions);
+            
+            const buffer = appState.get('predictionBuffer') || [];
+            const voteCounts = {};
+            buffer.forEach(v => voteCounts[v] = (voteCounts[v] || 0) + 1);
+            debugPanel.updateBufferVotes(voteCounts, buffer.length, true);
 
-        // Run state prediction
-        const predictions = await stateDetector.predict();
-        if (predictions) {
-            const result = stateDetector.processPredictionBuffer(predictions);
+            // Process flow state machine with simulated class
+            this.processFlowStateMachine(simulatedClass, now);
 
-            // Update debug display
-            debugPanel.updateProbabilities(predictions);
-            debugPanel.updateBufferVotes(result.voteCounts, appState.get('predictionBuffer').length);
+            // Check for simulated gesture confirmation
+            if (this.gestureDetectionActive) {
+                const confirmedGesture = appState.get('confirmedGesture');
+                if (confirmedGesture) {
+                    this.handleGestureResponse(confirmedGesture);
+                    appState.set('confirmedGesture', null);
+                }
+            }
+        } else {
+            // Normal ML detection
+            stateDetector.updateFrame();
 
-            // Get ML detection results
-            const mlClass = result.newClass || appState.get('currentClass');
-            if (result.newClass !== null) {
-                appState.set('currentClass', result.newClass);
-                appState.set('lastClassChange', now);
+            const predictions = await stateDetector.predict();
+            if (predictions) {
+                const result = stateDetector.processPredictionBuffer(predictions);
+
+                // Update debug display
+                debugPanel.updateProbabilities(predictions);
+                debugPanel.updateBufferVotes(result.voteCounts, appState.get('predictionBuffer').length, result.isStable);
+
+                // Get ML detection results
+                const mlClass = result.newClass || appState.get('currentClass');
+                if (result.newClass !== null) {
+                    appState.set('currentClass', result.newClass);
+                    appState.set('lastClassChange', now);
+                }
+
+                // Process flow state machine based on ML class
+                this.processFlowStateMachine(mlClass, now);
             }
 
-            // Process flow state machine based on ML class
-            this.processFlowStateMachine(mlClass, now);
-        }
-
-        // Process gesture detection if active
-        if (this.gestureDetectionActive) {
-            await this.processGestureDetection(now);
+            // Process gesture detection if active
+            if (this.gestureDetectionActive) {
+                await this.processGestureDetection(now);
+            }
         }
 
         // Update debug
@@ -483,7 +562,8 @@ class AppController {
                     debugPanel.updateElement('taskDuration', `${Math.floor(taskDuration / 1000)}s`);
 
                     // Task > 20s? → LONG_TASK (ask music)
-                    if (taskDuration > TIMING.LONG_TASK_THRESHOLD && !this.musicAsked && this.canAskMusic()) {
+                    // canAskMusic() checks cooldown period
+                    if (taskDuration > TIMING.LONG_TASK_THRESHOLD && this.canAskMusic()) {
                         this.transitionTo(FLOW_STATE.LONG_TASK);
                     }
                 }
@@ -549,6 +629,7 @@ class AppController {
                 else {
                     const taskDuration = now - this.taskStartTime;
                     appState.set('taskDuration', Math.floor(taskDuration / 1000));
+                    debugPanel.updateElement('taskDuration', `${Math.floor(taskDuration / 1000)}s 🎵`);
                 }
                 break;
 
@@ -672,6 +753,23 @@ class AppController {
             appState.set('frameCount', 0);
             appState.set('lastFpsUpdate', now);
             debugPanel.updateFPS(frameCount);
+        }
+    }
+
+    /**
+     * Request fullscreen mode
+     */
+    requestFullscreen() {
+        const elem = document.documentElement;
+        
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen().catch(err => {
+                console.warn('Fullscreen request failed:', err);
+            });
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen();
         }
     }
 }

@@ -132,6 +132,9 @@ class AnimationManager {
             return this.loadMusicPlayingAnimation(routeConfig);
         }
 
+        // Clear any existing content to prevent duplicates
+        centerContainer.innerHTML = '';
+
         // Create wrapper for center content
         const wrapper = document.createElement('div');
         wrapper.className = 'center-content';
@@ -143,17 +146,18 @@ class AnimationManager {
         img.className = 'center-svg';
         wrapper.appendChild(img);
 
-        // Move corner container into wrapper for positioning
-        wrapper.appendChild(cornerContainer.cloneNode(true));
+        // Create a new corner lottie container inside wrapper
+        const newCorner = document.createElement('div');
+        newCorner.id = 'corner-lottie-inner';
+        newCorner.className = 'corner-lottie-inner';
+        wrapper.appendChild(newCorner);
+        
         centerContainer.appendChild(wrapper);
 
         // Load corner Lottie animation
-        const actualCorner = centerContainer.querySelector('#corner-lottie') || 
-                            document.getElementById('corner-lottie');
-        
-        if (actualCorner && routeConfig.cornerLottie) {
+        if (routeConfig.cornerLottie) {
             this.cornerAnimation = lottie.loadAnimation({
-                container: actualCorner,
+                container: newCorner,
                 renderer: 'svg',
                 loop: true,
                 autoplay: true,

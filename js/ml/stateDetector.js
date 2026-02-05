@@ -167,15 +167,27 @@ class StateDetector {
         const currentClass = appState.get('currentClass');
         const lastClassChange = appState.get('lastClassChange');
 
+        // Track consecutive predictions for stability (especially for Class 4)
+        const lastPredictions = buffer.slice(-CONFIG.stabilityFrames);
+        const isStable = lastPredictions.every(p => p === majorityClass);
+        
+        // For Class 4 (Interruption), require extra stability to avoid false triggers
+        const requiresStability = majorityClass === 4;
+        const stabilityMet = !requiresStability || isStable;
+
         if (majorityClass !== currentClass 
             && majorityRatio >= CONFIG.majorityThreshold
-            && (now - lastClassChange) > CONFIG.stateDebounceMs) {
+            && (now - lastClassChange) > CONFIG.stateDebounceMs
+            && stabilityMet) {
+            
+            console.log(`State change: Class ${currentClass} → Class ${majorityClass} (confidence: ${(majorityRatio * 100).toFixed(0)}%, stable: ${isStable})`);
             
             return {
                 newClass: majorityClass,
                 oldClass: currentClass,
                 confidence: majorityRatio,
-                voteCounts
+                voteCounts,
+                isStable
             };
         }
 
@@ -183,7 +195,8 @@ class StateDetector {
             newClass: null,
             currentClass,
             confidence: majorityRatio,
-            voteCounts
+            voteCounts,
+            isStable
         };
     }
 

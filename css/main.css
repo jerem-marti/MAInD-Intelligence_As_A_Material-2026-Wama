@@ -40,20 +40,32 @@
 }
 
 html, body {
-    width: 100%;
-    min-height: 100vh;
+    width: 100dvw;
+    height: 100dvh;
+    min-height: 100dvh;
+    max-height: 100dvh;
     background-color: var(--bg-color);
     font-family: var(--font-primary);
     color: var(--text-color);
     line-height: 1.5;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    -webkit-overflow-scrolling: touch;
+    touch-action: none;
 }
 
 /* App Container */
 #app {
-    min-height: 100vh;
+    height: 100dvh;
+    max-height: 100dvh;
     display: flex;
     flex-direction: column;
     position: relative;
+    overflow: hidden;
 }
 
 /* Header */
@@ -84,6 +96,7 @@ html, body {
     position: relative;
     z-index: 10;
     transition: opacity var(--transition-fast);
+    overflow: hidden;
 }
 
 #page-container.transitioning {

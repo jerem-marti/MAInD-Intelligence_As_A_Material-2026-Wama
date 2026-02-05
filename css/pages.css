@@ -57,18 +57,23 @@ body.page-worried .page-nav {
 
 body.page-worried #lottie-container {
     justify-content: flex-start;
-    height: 70vh;
-    max-height: 70vh;
+    height: 70dvh;
+    max-height: 70dvh;
     z-index: 1;
+    width: 100dvw;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    transform: none;
 }
 
 body.page-worried #lottie-container svg,
 body.page-worried #lottie-container img {
     max-height: 100%;
-    max-width: 100%;
     width: auto;
     height: auto;
     object-fit: contain;
+    animation: worried-walk 6s linear infinite;
 }
 
 /* ==========================================================================
@@ -104,41 +109,67 @@ body.page-musicplaying #center-container {
     inset: 0;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     pointer-events: none;
     z-index: 1;
+    width: 100vw;
+    overflow: visible;
 }
 
 body.page-musicplaying .center-content {
     position: relative;
     display: inline-block;
+    animation: dancing-walk 8s linear infinite;
 }
 
 body.page-musicplaying #center-container img.center-svg {
     max-height: 70vh;
-    max-width: 90vw;
     width: auto;
     height: auto;
     object-fit: contain;
     pointer-events: auto;
     display: block;
-    animation: dancing-sway 4s ease-in-out infinite;
 }
 
-body.page-musicplaying #corner-lottie {
+body.page-musicplaying .center-content #corner-lottie,
+body.page-musicplaying .center-content .corner-lottie-inner {
     position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    width: 200px;
-    height: 165px;
+    top: -30px;
+    right: -30px;
+    width: 120px;
+    height: 100px;
     z-index: 2;
     pointer-events: none;
 }
 
-body.page-musicplaying #corner-lottie svg {
+body.page-musicplaying .center-content #corner-lottie svg,
+body.page-musicplaying .center-content .corner-lottie-inner svg {
     width: 100%;
     height: 100%;
     display: block;
+}
+
+.btn-quit-music {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.8rem 2rem;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: 2px solid white;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    z-index: 9999;
+    transition: background 0.3s, transform 0.2s;
+    pointer-events: auto;
+}
+
+.btn-quit-music:hover {
+    background: rgba(255, 0, 0, 0.7);
+    transform: translateX(-50%) scale(1.05);
 }
 
 /* ==========================================================================
@@ -184,4 +215,50 @@ body.page-idle {
 
 body.page-idle #lottie-container {
     display: none;
+}
+
+/* First run - show start button */
+.page-idle-firstrun {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.page-idle-firstrun .idle-message {
+    text-align: center;
+}
+
+.page-idle-firstrun .btn-start {
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    cursor: pointer;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    transition: background 0.3s;
+}
+
+.page-idle-firstrun .btn-start:hover {
+    background: #45a049;
+}
+
+/* Inactive state - black screen */
+.page-idle-inactive {
+    background: #000;
+    min-height: 100vh;
+    width: 100vw;
+}
+
+body.page-idle.page-idle-inactive-mode {
+    background: #000 !important;
+}
+
+body.page-idle.page-idle-inactive-mode #app-header {
+    display: none;
+}
+
+body.page-idle.page-idle-inactive-mode #debug-panel {
+    opacity: 0.3;
 }
