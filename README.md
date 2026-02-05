@@ -2,6 +2,17 @@
 
 A merged project combining ML-powered state detection with beautiful Lottie animations for an interactive sink companion experience.
 
+## Features
+
+- **ML State Detection** - Teachable Machine model detects 4 states (Idle, Person Present, Task Active, Interruption)
+- **Gesture Recognition** - MediaPipe Hands for thumbs up/down music responses
+- **Animated Character** - Lottie animations for different states (hello, working, worried, dancing)
+- **Music Mode** - Ask for music after 20s of work, with 75s cooldown between asks
+- **Interruption Handling** - Worried animation when person leaves with water running
+- **Session Management** - First-run start button, returning shows black screen
+- **Mobile Optimized** - Fullscreen mode, dynamic viewport units (dvh/dvw), screen wake lock
+- **Debug Panel** - Hidden panel (click to reveal) for development and testing
+
 ## Project Structure
 
 ```
@@ -106,16 +117,41 @@ Centralized state in `js/core/state.js`:
 
 | Route | Description | ML Class |
 |-------|-------------|----------|
-| `#idle` | Waiting for detection | Class 1 |
-| `#hello` | Person detected | Class 2 |
-| `#howareyou` | Greeting continuation | Class 2 |
-| `#working` | Person at sink with water | Class 3 |
-| `#askmusic` | Asking if user wants music | Class 3 |
-| `#musicplaying` | Music is playing | Class 3 |
-| `#worried` | Water running, no person | Class 4 |
-| `#youreback` | Person returned after absence | Class 2 |
-| `#bye` | Session ending | Class 1 |
-| `#sessionfinished` | Session complete | Class 1 |
+| `#idle` | Waiting for detection (start button on first run, black screen on return) | Class 1 |
+| `#hello` | Person detected - Wama says hi | Class 2 |
+| `#working` | Person at sink with water - silent observation | Class 3 |
+| `#askmusic` | Asking if user wants music (after 20s of work) | Class 3 |
+| `#musicplaying` | Music is playing - Wama dances (quit button available) | Class 3 |
+| `#worried` | Water running, no person - Wama worried | Class 4 |
+| `#youreback` | Person returned after absence - relief | Class 2 |
+| `#sessionfinished` | Water turned off - session ending prompt | Class 1 |
+| `#bye` | Session ending - goodbye | Class 1 |
+
+## Flow Logic
+
+```
+IDLE → Person arrives → HELLO → Water on → WORKING
+                                              ↓
+                              After 20s → ASK MUSIC → Yes → MUSIC PLAYING
+                                              ↓              ↓
+                                              No → WORKING ← Quit button
+                                              
+At any point:
+- Person leaves + water on → WORRIED → Person returns → YOU'RE BACK → Resume
+- Water off → SESSION FINISHED → BYE → IDLE
+```
+
+### Timing Thresholds
+
+| Threshold | Duration | Description |
+|-----------|----------|-------------|
+| Inactivity | 2s | Time without activity before sleep |
+| Long Task | 20s | Work time before asking about music |
+| Music Cooldown | 75s | Time before asking music again |
+| Gesture Timeout | 15s | Time to respond to music question |
+| Relief Duration | 3s | Time showing "you're back" message |
+| Session Finished | 5s | Time showing session finished prompt |
+| Goodbye | 5s | Time showing goodbye before idle |
 
 ## Setup
 
@@ -140,10 +176,19 @@ npx serve
 ## Technologies
 
 - **TensorFlow.js** - ML model inference
-- **Teachable Machine** - State classification model
-- **MediaPipe Hands** - Gesture recognition
+- **Teachable Machine** - State classification model (4 classes)
+- **MediaPipe Hands** - Gesture recognition (thumbs up/down)
 - **Lottie** - Vector animations
 - **ES Modules** - Modern JavaScript modules
+- **Screen Wake Lock API** - Prevents screen from sleeping
+- **Dynamic Viewport Units** - dvh/dvw for mobile compatibility
+
+## Mobile Optimizations
+
+- **Fullscreen Mode** - Enters fullscreen when starting detection
+- **Wake Lock** - Screen stays on during detection
+- **Touch Prevention** - No scroll/zoom interference
+- **Dynamic Viewport** - Uses dvh/dvw units for proper mobile sizing
 
 ## Future Improvements
 
@@ -152,4 +197,5 @@ The logic layer is designed to be easily modified:
 1. Route-to-class mapping can be customized in `js/config/config.js`
 2. New routes can be added in `js/config/routes.js`
 3. ML behavior can be adjusted in `js/controllers/appController.js`
-4. Animations can be swapped by updating route configurations
+4. Timing thresholds can be modified in `appController.js` TIMING object
+5. Animations can be swapped by updating route configurations
