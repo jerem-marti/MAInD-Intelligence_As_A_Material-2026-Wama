@@ -1,0 +1,343 @@
+/**
+ * Main Styles
+ * Core styling for the application
+ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Colors - matching wama-animation aesthetic */
+    --bg-color: #F3F2EE;
+    --text-color: #333333;
+    --text-dim: #666666;
+    --border-color: #cccccc;
+    --accent-color: #333333;
+    
+    /* Animation colors */
+    --class1-color: #6b7280;
+    --class2-color: #3b82f6;
+    --class3-color: #22c55e;
+    --class4-color: #f59e0b;
+    
+    /* Typography */
+    --font-primary: 'Proto Mono', monospace, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+    
+    /* Transitions */
+    --transition-fast: 150ms ease;
+    --transition-normal: 300ms ease;
+    --transition-slow: 500ms ease;
+}
+
+html, body {
+    width: 100%;
+    min-height: 100vh;
+    background-color: var(--bg-color);
+    font-family: var(--font-primary);
+    color: var(--text-color);
+    line-height: 1.5;
+}
+
+/* App Container */
+#app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* Header */
+.app-header {
+    padding: var(--spacing-lg);
+    text-align: center;
+    position: relative;
+    z-index: 9999;
+}
+
+.app-header.hidden {
+    display: none;
+}
+
+.app-header .title {
+    font-size: 24px;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+}
+
+/* Page Container */
+#page-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--spacing-md);
+    position: relative;
+    z-index: 10;
+    transition: opacity var(--transition-fast);
+}
+
+#page-container.transitioning {
+    opacity: 0;
+}
+
+/* Page Content */
+.page-content {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Navigation Links */
+.page-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    justify-content: center;
+    margin-top: var(--spacing-lg);
+    position: relative;
+    z-index: 9999;
+}
+
+.nav-link {
+    display: inline-block;
+    font-family: var(--font-primary);
+    font-size: 1rem;
+    padding: var(--spacing-sm) var(--spacing-md);
+    color: var(--text-color);
+    text-decoration: none;
+    border: 1px solid var(--text-color);
+    border-radius: 4px;
+    transition: all var(--transition-fast);
+}
+
+.nav-link:hover {
+    background: var(--text-color);
+    color: var(--bg-color);
+}
+
+/* Buttons */
+.btn {
+    font-family: var(--font-primary);
+    font-size: 1rem;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: 2px solid var(--text-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    background: transparent;
+    color: var(--text-color);
+}
+
+.btn:hover {
+    background: var(--text-color);
+    color: var(--bg-color);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-start {
+    background: var(--class3-color);
+    border-color: var(--class3-color);
+    color: white;
+}
+
+.btn-start:hover {
+    background: #1aa34a;
+    border-color: #1aa34a;
+}
+
+/* Lottie Container */
+#lottie-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    min-height: 40vh;
+    max-height: 50vh;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 1;
+}
+
+#lottie-container svg,
+#lottie-container img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    pointer-events: auto;
+}
+
+#lottie-container .lottie-svg {
+    max-height: 100%;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+}
+
+#lottie-container .lottie-svg.visible {
+    opacity: 1;
+}
+
+/* Background Lottie */
+#bg-lottie {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    transform: translateY(100%);
+    opacity: 0;
+}
+
+#bg-lottie.waves-ready {
+    animation: waves-enter 4.5s ease-out infinite;
+}
+
+#bg-lottie > div {
+    width: 100% !important;
+    min-width: 100% !important;
+    min-height: 100%;
+}
+
+#bg-lottie svg {
+    width: 100% !important;
+    min-width: 100% !important;
+    height: 100% !important;
+    display: block;
+    object-fit: cover;
+    object-position: bottom;
+}
+
+/* Hidden Webcam */
+.webcam-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    pointer-events: none;
+}
+
+/* Loading State */
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 50vh;
+    gap: var(--spacing-md);
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--text-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Error State */
+.error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 50vh;
+    gap: var(--spacing-md);
+    text-align: center;
+}
+
+.error-message {
+    color: #ef4444;
+    font-size: 1.1rem;
+}
+
+/* Idle Page */
+.page-idle-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+}
+
+.idle-message {
+    text-align: center;
+}
+
+.idle-message p {
+    margin-bottom: var(--spacing-lg);
+    font-size: 1.2rem;
+    color: var(--text-dim);
+}
+
+/* Gesture Prompt */
+.gesture-prompt {
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.gesture-hint {
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.gesture-countdown {
+    font-size: 1rem;
+    color: var(--text-dim);
+}
+
+.hold-progress {
+    font-size: 1rem;
+    color: var(--class3-color);
+    margin-top: var(--spacing-sm);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .app-header .title {
+        font-size: 20px;
+    }
+    
+    #lottie-container {
+        min-height: 30vh;
+        max-height: 40vh;
+    }
+    
+    .nav-link {
+        font-size: 0.9rem;
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+}

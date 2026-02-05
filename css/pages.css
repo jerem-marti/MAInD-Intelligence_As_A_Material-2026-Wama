@@ -1,0 +1,187 @@
+/**
+ * Page-specific Styles
+ * Styles for individual page layouts
+ */
+
+/* ==========================================================================
+   Working Page
+   ========================================================================== */
+body.page-working #lottie-container {
+    justify-content: flex-start;
+    height: 100%;
+    max-height: 100%;
+}
+
+body.page-working #lottie-container svg,
+body.page-working #lottie-container img {
+    max-height: 100%;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    animation: working-walk 8s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   Ask Music Page
+   ========================================================================== */
+body.page-askmusic #lottie-container {
+    justify-content: center;
+    height: 90vh;
+    max-height: 90vh;
+}
+
+body.page-askmusic #lottie-container svg,
+body.page-askmusic #lottie-container img {
+    max-height: 100%;
+    max-width: 100%;
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+    object-position: center;
+    animation: jukebox-pulse 2s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   Worried Page
+   ========================================================================== */
+body.page-worried {
+    background: transparent;
+}
+
+body.page-worried .title,
+body.page-worried .page-nav {
+    position: relative;
+    z-index: 9999;
+}
+
+body.page-worried #lottie-container {
+    justify-content: flex-start;
+    height: 70vh;
+    max-height: 70vh;
+    z-index: 1;
+}
+
+body.page-worried #lottie-container svg,
+body.page-worried #lottie-container img {
+    max-height: 100%;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+/* ==========================================================================
+   You're Back Page
+   ========================================================================== */
+body.page-youreback #lottie-container {
+    justify-content: center;
+    height: 70vh;
+    max-height: 70vh;
+}
+
+body.page-youreback #lottie-container svg,
+body.page-youreback #lottie-container img {
+    max-height: 100%;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    animation: youreback-scaleY 2s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   Music Playing Page
+   ========================================================================== */
+body.page-musicplaying .title,
+body.page-musicplaying .page-nav {
+    position: relative;
+    z-index: 9999;
+}
+
+body.page-musicplaying #center-container {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 1;
+}
+
+body.page-musicplaying .center-content {
+    position: relative;
+    display: inline-block;
+}
+
+body.page-musicplaying #center-container img.center-svg {
+    max-height: 70vh;
+    max-width: 90vw;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    pointer-events: auto;
+    display: block;
+    animation: dancing-sway 4s ease-in-out infinite;
+}
+
+body.page-musicplaying #corner-lottie {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 200px;
+    height: 165px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+body.page-musicplaying #corner-lottie svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* ==========================================================================
+   Hello Page
+   ========================================================================== */
+body.page-hello #lottie-container {
+    min-height: 40vh;
+    max-height: 50vh;
+}
+
+/* ==========================================================================
+   Bye Page
+   ========================================================================== */
+body.page-bye #lottie-container {
+    min-height: 40vh;
+    max-height: 50vh;
+}
+
+/* ==========================================================================
+   How Are You Page
+   ========================================================================== */
+body.page-howareyou #lottie-container {
+    min-height: 40vh;
+    max-height: 50vh;
+}
+
+/* ==========================================================================
+   Session Finished Page
+   ========================================================================== */
+body.page-sessionfinished #lottie-container {
+    min-height: 40vh;
+    max-height: 50vh;
+}
+
+/* ==========================================================================
+   Idle Page
+   ========================================================================== */
+body.page-idle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+body.page-idle #lottie-container {
+    display: none;
+}

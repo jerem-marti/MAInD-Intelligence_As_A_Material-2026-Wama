@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAInD Wama - Smart Sink Companion</title>
+    
+    <!-- Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Proto+Mono:wght@400;500;600;700&display=swap">
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.7.4/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8.4/dist/teachablemachine-image.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/pages.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/debug.css">
+</head>
+<body>
+    <!-- Main Application Container -->
+    <div id="app">
+        <!-- Header -->
+        <header id="app-header" class="app-header hidden">
+            <h1 class="title" id="page-title">MAInD Wama</h1>
+        </header>
+
+        <!-- Page Container (SPA views render here) -->
+        <main id="page-container"></main>
+
+        <!-- Lottie Animation Container -->
+        <div id="lottie-container"></div>
+        
+        <!-- Background Lottie (for waves, etc.) -->
+        <div id="bg-lottie"></div>
+
+        <!-- Debug Panel (collapsible) -->
+        <details id="debug-panel" class="debug-panel">
+            <summary>Debug Info</summary>
+            <div class="debug-content">
+                <div class="debug-section-title">State Model</div>
+                <div id="debug-probabilities"></div>
+
+                <div class="debug-section-title">Prediction Buffer</div>
+                <div id="debug-buffer-votes" class="debug-buffer">-</div>
+
+                <div class="debug-section-title">Gesture Detection (MediaPipe Hands)</div>
+                <div class="debug-grid">
+                    <div class="debug-item">
+                        <span class="debug-label">Active:</span>
+                        <span id="debug-gesture-active" class="debug-value">OFF</span>
+                    </div>
+                    <div class="debug-item">
+                        <span class="debug-label">Hand:</span>
+                        <span id="debug-hand-detected" class="debug-value">-</span>
+                    </div>
+                    <div class="debug-item">
+                        <span class="debug-label">Current:</span>
+                        <span id="debug-current-gesture" class="debug-value">-</span>
+                    </div>
+                    <div class="debug-item">
+                        <span class="debug-label">Hold:</span>
+                        <span id="debug-hold-duration" class="debug-value">0ms</span>
+                    </div>
+                    <div class="debug-item">
+                        <span class="debug-label">Thumb Y:</span>
+                        <span id="debug-thumb-vertical" class="debug-value">-</span>
+                    </div>
+                    <div class="debug-item">
+                        <span class="debug-label">Fingers Curled:</span>
+                        <span id="debug-fingers-curled" class="debug-value">-</span>
+                    </div>
+                </div>
+
+                <div class="debug-section-title">Music Flow</div>
+                <div class="debug-grid">
+                    <div class="debug-item">
+                        <span class="debug-label">Question Timer:</span>
+                        <span id="debug-question-timer" class="debug-value">-</span>
+                    </div>
+                    <div class="debug-item">
+                        <span class="debug-label">Music Response:</span>
+                        <span id="debug-music-response" class="debug-value">-</span>
+                    </div>
+                </div>
+
+                <div class="debug-section-title">Current State</div>
+                <div class="debug-grid">
+                    <div class="debug-item">
+                        <span class="debug-label">Route:</span>
+                        <span id="debug-current-route" class="debug-value">-</span>
+                    </div>
+                    <div class="debug-item">
+                        <span class="debug-label">ML Class:</span>
+                        <span id="debug-ml-class" class="debug-value">-</span>
+                    </div>
+                    <div class="debug-item">
+                        <span class="debug-label">Task Duration:</span>
+                        <span id="debug-task-duration" class="debug-value">-</span>
+                    </div>
+                    <div class="debug-item">
+                        <span class="debug-label">FPS:</span>
+                        <span id="debug-fps" class="debug-value">-</span>
+                    </div>
+                </div>
+            </div>
+        </details>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="audio-music" src="assets/audio/music.mp3" preload="auto"></audio>
+    <audio id="audio-hello" src="assets/audio/hello.mp3" preload="auto"></audio>
+    <audio id="audio-bye" src="assets/audio/bye.mp3" preload="auto"></audio>
+    <audio id="audio-worried" src="assets/audio/worried.mp3" preload="auto" loop></audio>
+
+    <!-- Hidden Webcam Container (for ML processing) -->
+    <div id="webcam-container" class="webcam-hidden"></div>
+
+    <!-- Application Modules -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

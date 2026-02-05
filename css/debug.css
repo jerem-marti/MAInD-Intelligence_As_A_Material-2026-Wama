@@ -1,0 +1,199 @@
+/**
+ * Debug Panel Styles
+ * Styles for the debug information panel
+ */
+
+/* ==========================================================================
+   Debug Panel Container
+   ========================================================================== */
+.debug-panel {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.9);
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 0;
+    font-size: 12px;
+    font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+    max-width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 99999;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.debug-panel summary {
+    padding: 10px 15px;
+    cursor: pointer;
+    user-select: none;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px 8px 0 0;
+    outline: none;
+}
+
+.debug-panel summary:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.debug-panel[open] summary {
+    border-radius: 8px 8px 0 0;
+}
+
+.debug-content {
+    padding: 15px;
+}
+
+/* ==========================================================================
+   Debug Sections
+   ========================================================================== */
+.debug-section-title {
+    font-weight: 600;
+    color: #60a5fa;
+    margin-top: 15px;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+}
+
+.debug-section-title:first-child {
+    margin-top: 0;
+}
+
+/* ==========================================================================
+   Debug Grid Layout
+   ========================================================================== */
+.debug-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.debug-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.debug-label {
+    color: #9ca3af;
+    font-size: 11px;
+}
+
+.debug-value {
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.debug-value.active {
+    color: #22c55e;
+}
+
+/* ==========================================================================
+   Probability Bars
+   ========================================================================== */
+.prob-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.prob-label {
+    width: 120px;
+    font-size: 11px;
+    color: #9ca3af;
+    flex-shrink: 0;
+}
+
+.prob-track {
+    flex: 1;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.prob-fill {
+    height: 100%;
+    background: #6b7280;
+    border-radius: 4px;
+    transition: width 100ms ease, background 200ms ease;
+}
+
+.prob-fill.active {
+    background: #22c55e;
+}
+
+.prob-value {
+    width: 40px;
+    text-align: right;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   Buffer Display
+   ========================================================================== */
+.debug-buffer {
+    font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+    font-size: 11px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    word-break: break-all;
+}
+
+/* ==========================================================================
+   Class Colors
+   ========================================================================== */
+.debug-class-1 { color: #6b7280; }
+.debug-class-2 { color: #3b82f6; }
+.debug-class-3 { color: #22c55e; }
+.debug-class-4 { color: #f59e0b; }
+
+/* ==========================================================================
+   Scrollbar Styling
+   ========================================================================== */
+.debug-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.debug-panel::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.debug-panel::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.debug-panel::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 768px) {
+    .debug-panel {
+        bottom: 5px;
+        right: 5px;
+        left: 5px;
+        max-width: none;
+        font-size: 11px;
+    }
+    
+    .debug-grid {
+        grid-template-columns: 1fr;
+    }
+}
