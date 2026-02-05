@@ -33,18 +33,20 @@ const FLOW_STATE = {
     MUSIC_PLAYING: 'music_playing',         // 4. Music Playing - Dance
     INTERRUPTION: 'interruption',           // 5. Interruption Scenario - Worried
     RETURN_AFTER_ABSENCE: 'return_after',   // 6. Return After Absence - Relief
+    SESSION_FINISHED: 'session_finished',   // Session finished prompt
     SESSION_ENDS: 'session_ends'            // 5. Session Ends - Goodbye
 };
 
 // Timing thresholds (from flowchart)
 const TIMING = {
-    INACTIVITY_TIMEOUT: 2000,       // 2 sec without activity → sleep
+    INACTIVITY_TIMEOUT: 5000,       // 5 sec without activity → sleep
     LONG_TASK_THRESHOLD: 20000,     // 20 sec for long task scenario
-    MUSIC_COOLDOWN: 300000,         // 5 min before asking music again
-    GESTURE_TIMEOUT: 25000,         // 25 sec to respond to music question
-    WORRY_DELAY: 10000,             // 10-15 sec before showing worry
-    SUDDEN_WAVE_CHECK: 5000,        // 5 sec sudden wave start check
+    MUSIC_COOLDOWN: 120000,         // 2 min before asking music again
+    GESTURE_TIMEOUT: 15000,         // 15 sec to respond to music question
+    WORRY_DELAY: 5000,              // 5 sec before showing worry
+    // SUDDEN_WAVE_CHECK: 5000,        // 5 sec sudden wave start check
     RELIEF_DURATION: 3000,          // 3 sec to show relief message
+    SESSION_FINISHED_DURATION: 5000,// 5 sec to show "Session Finished?"
     GOODBYE_DURATION: 5000          // 5 sec to show goodbye
 };
 
@@ -212,6 +214,7 @@ class AppController {
         this.musicAsked = false;
         this.musicResponse = null;
         this.gestureDetectionActive = false;
+        appState.set('gestureDetectionActive', false);
         this.gestureStartTime = null;
         
         appState.resetMusicFlow();
@@ -273,6 +276,7 @@ class AppController {
                 // 7. Long Task - Ask music question
                 if (this.canAskMusic()) {
                     this.gestureDetectionActive = true;
+                    appState.set('gestureDetectionActive', true);
                     this.gestureStartTime = now;
                     this.lastMusicAskTime = now;
                     this.musicAsked = true;
@@ -284,6 +288,7 @@ class AppController {
                 // 4. Music Playing - Dance
                 this.musicResponse = 'yes';
                 this.gestureDetectionActive = false;
+                appState.set('gestureDetectionActive', false);
                 console.log('Music playing - Wama dances');
                 break;
 
@@ -302,6 +307,17 @@ class AppController {
                         this.transitionTo(FLOW_STATE.TASK_ACTIVE);
                     }
                 }, TIMING.RELIEF_DURATION);
+                break;
+
+            case FLOW_STATE.SESSION_FINISHED:
+                // Session Finished - Show "Session Finished?" message
+                console.log('Session finished - Wama asks: Session Finished?');
+                // After 5 seconds, transition to goodbye
+                setTimeout(() => {
+                    if (this.flowState === FLOW_STATE.SESSION_FINISHED) {
+                        this.transitionTo(FLOW_STATE.SESSION_ENDS);
+                    }
+                }, TIMING.SESSION_FINISHED_DURATION);
                 break;
 
             case FLOW_STATE.SESSION_ENDS:
@@ -329,6 +345,7 @@ class AppController {
             [FLOW_STATE.MUSIC_PLAYING]: 'musicplaying',
             [FLOW_STATE.INTERRUPTION]: 'worried',
             [FLOW_STATE.RETURN_AFTER_ABSENCE]: 'youreback',
+            [FLOW_STATE.SESSION_FINISHED]: 'sessionfinished',
             [FLOW_STATE.SESSION_ENDS]: 'bye'
         };
         return stateRouteMap[state];
@@ -401,6 +418,11 @@ class AppController {
         const personPresent = (mlClass === 2 || mlClass === 3);
         const waterOn = (mlClass === 3 || mlClass === 4);
 
+        // Debug logging for state detection
+        if (mlClass === 4) {
+            console.log(`ML Class 4 detected: person=${personPresent}, water=${waterOn}, flowState=${this.flowState}`);
+        }
+
         switch (this.flowState) {
             // =================================================================
             // 0. IDLE STATE - Waiting for person
@@ -420,9 +442,13 @@ class AppController {
                 if (waterOn && personPresent) {
                     this.transitionTo(FLOW_STATE.TASK_ACTIVE);
                 }
+                // Water on but person left (Class 4)? → INTERRUPTION
+                else if (waterOn && !personPresent) {
+                    this.transitionTo(FLOW_STATE.INTERRUPTION);
+                }
                 // Person left without turning on tap?
                 else if (!personPresent) {
-                    // Check 2 sec inactivity timeout
+                    // Check 5 sec inactivity timeout
                     if (now - this.inactivityStartTime > TIMING.INACTIVITY_TIMEOUT) {
                         // Wama full asleep animation → back to IDLE
                         this.transitionTo(FLOW_STATE.IDLE);
@@ -442,8 +468,12 @@ class AppController {
                 if (!personPresent && waterOn) {
                     this.transitionTo(FLOW_STATE.INTERRUPTION);
                 }
-                // Task off (water off)? → SESSION_ENDS
-                else if (!waterOn) {
+                // Task off (water off) with person present? → SESSION_FINISHED first
+                else if (!waterOn && personPresent) {
+                    this.transitionTo(FLOW_STATE.SESSION_FINISHED);
+                }
+                // Task off (water off) without person? → SESSION_ENDS directly
+                else if (!waterOn && !personPresent) {
                     this.transitionTo(FLOW_STATE.SESSION_ENDS);
                 }
                 // Still working - check for long task
@@ -466,17 +496,26 @@ class AppController {
                 // Person leaves but water still on? → INTERRUPTION
                 if (!personPresent && waterOn) {
                     this.gestureDetectionActive = false;
+                    appState.set('gestureDetectionActive', false);
                     this.transitionTo(FLOW_STATE.INTERRUPTION);
                 }
-                // Task off? → SESSION_ENDS
-                else if (!waterOn) {
+                // Task off with person present? → SESSION_FINISHED
+                else if (!waterOn && personPresent) {
                     this.gestureDetectionActive = false;
+                    appState.set('gestureDetectionActive', false);
+                    this.transitionTo(FLOW_STATE.SESSION_FINISHED);
+                }
+                // Task off without person? → SESSION_ENDS
+                else if (!waterOn && !personPresent) {
+                    this.gestureDetectionActive = false;
+                    appState.set('gestureDetectionActive', false);
                     this.transitionTo(FLOW_STATE.SESSION_ENDS);
                 }
                 // Check gesture timeout (25 seconds)
                 else if (this.gestureStartTime && (now - this.gestureStartTime > TIMING.GESTURE_TIMEOUT)) {
                     console.log('Gesture timeout - no response');
                     this.gestureDetectionActive = false;
+                    appState.set('gestureDetectionActive', false);
                     this.musicResponse = 'timeout';
                     this.transitionTo(FLOW_STATE.TASK_ACTIVE);
                 }
@@ -496,8 +535,13 @@ class AppController {
                     audioManager.pause(); // Pause music during interruption
                     this.transitionTo(FLOW_STATE.INTERRUPTION);
                 }
-                // Task off? → SESSION_ENDS
-                else if (!waterOn) {
+                // Task off with person present? → SESSION_FINISHED
+                else if (!waterOn && personPresent) {
+                    audioManager.stop();
+                    this.transitionTo(FLOW_STATE.SESSION_FINISHED);
+                }
+                // Task off without person? → SESSION_ENDS
+                else if (!waterOn && !personPresent) {
                     audioManager.stop();
                     this.transitionTo(FLOW_STATE.SESSION_ENDS);
                 }
@@ -536,7 +580,27 @@ class AppController {
                 if (!personPresent && waterOn) {
                     this.transitionTo(FLOW_STATE.INTERRUPTION);
                 }
-                else if (!waterOn) {
+                // Water off with person present? → SESSION_FINISHED
+                else if (!waterOn && personPresent) {
+                    this.transitionTo(FLOW_STATE.SESSION_FINISHED);
+                }
+                // Water off without person? → SESSION_ENDS
+                else if (!waterOn && !personPresent) {
+                    this.transitionTo(FLOW_STATE.SESSION_ENDS);
+                }
+                break;
+
+            // =================================================================
+            // SESSION FINISHED - Show "Session Finished?" message
+            // =================================================================
+            case FLOW_STATE.SESSION_FINISHED:
+                // Auto-transitions to SESSION_ENDS after timeout
+                // But if person starts task again, go back to TASK_ACTIVE
+                if (personPresent && waterOn) {
+                    this.transitionTo(FLOW_STATE.TASK_ACTIVE);
+                }
+                // Person left? Go directly to SESSION_ENDS
+                else if (!personPresent) {
                     this.transitionTo(FLOW_STATE.SESSION_ENDS);
                 }
                 break;
@@ -584,6 +648,7 @@ class AppController {
     handleGestureResponse(gesture) {
         console.log(`Gesture confirmed: ${gesture}`);
         this.gestureDetectionActive = false;
+        appState.set('gestureDetectionActive', false);
 
         if (gesture === GESTURES.YES) {
             // Thumbs up → Play music

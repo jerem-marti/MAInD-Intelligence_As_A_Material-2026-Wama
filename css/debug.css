@@ -197,3 +197,35 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* ==========================================================================
+   Debug Audio Test Buttons
+   ========================================================================== */
+.debug-audio-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.debug-btn {
+    padding: 6px 10px;
+    font-size: 11px;
+    background: rgba(59, 130, 246, 0.3);
+    border: 1px solid rgba(59, 130, 246, 0.5);
+    color: #ffffff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.debug-btn:hover {
+    background: rgba(59, 130, 246, 0.5);
+    border-color: rgba(59, 130, 246, 0.8);
+}
+
+.debug-btn:active {
+    background: rgba(59, 130, 246, 0.7);
+    transform: scale(0.95);
+}

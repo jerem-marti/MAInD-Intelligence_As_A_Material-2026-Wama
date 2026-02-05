@@ -22,7 +22,7 @@ export const ROUTES = {
         title: 'How Are You?',
         pageClass: 'page-howareyou',
         lottie: { path: 'assets/animations/hello.json', loop: false, delay: 1000 },
-        audio: null,
+        audio: 'audio-howareyou',
         template: 'howareyou'
     },
     'working': {
@@ -36,7 +36,7 @@ export const ROUTES = {
         title: 'Want Some Music?',
         pageClass: 'page-askmusic',
         lottie: { path: 'assets/animations/jukebox.svg', loop: false, delay: 1000, isSvg: true },
-        audio: null,
+        audio: 'audio-askmusic',
         template: 'askmusic'
     },
     'musicplaying': {
@@ -63,14 +63,14 @@ export const ROUTES = {
         template: 'youreback'
     },
     'bye': {
-        title: 'Bye!',
+        title: 'Bye Bye!',
         pageClass: 'page-bye',
         lottie: { path: 'assets/animations/bye.json', loop: false, delay: 500 },
         audio: 'audio-bye',
         template: 'bye'
     },
     'sessionfinished': {
-        title: 'Session Finished',
+        title: 'Session Finished?',
         pageClass: 'page-sessionfinished',
         lottie: { path: 'assets/animations/hello.json', loop: false, delay: 0 },
         audio: null,

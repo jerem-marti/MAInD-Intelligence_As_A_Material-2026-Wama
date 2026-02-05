@@ -19,7 +19,9 @@ class AudioManager {
         // Get all audio elements
         this.audioElements = {
             music: document.getElementById('audio-music'),
+            askmusic: document.getElementById('audio-askmusic'),
             hello: document.getElementById('audio-hello'),
+            howareyou: document.getElementById('audio-howareyou'),
             bye: document.getElementById('audio-bye'),
             worried: document.getElementById('audio-worried')
         };
@@ -81,17 +83,22 @@ class AudioManager {
      */
     playForRoute(routeConfig) {
         if (!routeConfig.audio) {
-            this.stop();
+            // Don't stop looping audio (music, worried) when navigating to routes without audio
+            // Only stop non-looping audio
+            if (this.currentAudio && !this.currentAudio.loop) {
+                this.stop();
+            }
             return;
         }
 
         // Extract audio name from element ID
         const audioName = routeConfig.audio.replace('audio-', '');
         
-        // Determine if it should loop
+        // Determine if it should loop (background music)
         const loopingAudio = ['worried', 'music'];
         const shouldLoop = loopingAudio.includes(audioName);
 
+        console.log(`Playing audio: ${audioName}, loop: ${shouldLoop}`);
         this.play(audioName, { loop: shouldLoop });
     }
 

@@ -25,8 +25,6 @@ class DebugPanel {
             handDetected: document.getElementById('debug-hand-detected'),
             currentGesture: document.getElementById('debug-current-gesture'),
             holdDuration: document.getElementById('debug-hold-duration'),
-            thumbVertical: document.getElementById('debug-thumb-vertical'),
-            fingersCurled: document.getElementById('debug-fingers-curled'),
             questionTimer: document.getElementById('debug-question-timer'),
             musicResponse: document.getElementById('debug-music-response'),
             currentRoute: document.getElementById('debug-current-route'),
@@ -37,6 +35,9 @@ class DebugPanel {
 
         // Initialize probability bars
         this.initProbabilityDisplay();
+
+        // Initialize gesture bars
+        this.initGestureBars();
 
         // Subscribe to state changes
         this.subscribeToEvents();
@@ -137,6 +138,38 @@ class DebugPanel {
     }
 
     /**
+     * Initialize gesture probability bars
+     */
+    initGestureBars() {
+        const container = document.getElementById('debug-gesture-bars');
+        if (!container) return;
+
+        container.innerHTML = `
+            <div class="prob-bar">
+                <span class="prob-label">Thumb Y (up/down)</span>
+                <div class="prob-track">
+                    <div class="prob-fill" id="gesture-thumb-bar" style="background: #6b7280;"></div>
+                </div>
+                <span class="prob-value" id="gesture-thumb-value">0</span>
+            </div>
+            <div class="prob-bar">
+                <span class="prob-label">Fingers Curled</span>
+                <div class="prob-track">
+                    <div class="prob-fill" id="gesture-curl-bar"></div>
+                </div>
+                <span class="prob-value" id="gesture-curl-value">0/4</span>
+            </div>
+            <div class="prob-bar">
+                <span class="prob-label">Hold Progress</span>
+                <div class="prob-track">
+                    <div class="prob-fill" id="gesture-hold-bar" style="background: #f59e0b;"></div>
+                </div>
+                <span class="prob-value" id="gesture-hold-value">0%</span>
+            </div>
+        `;
+    }
+
+    /**
      * Update gesture detection info
      */
     updateGestureInfo() {
@@ -164,23 +197,51 @@ class DebugPanel {
         }
 
         // Hold duration
+        const holdDuration = gestureHoldStart ? Date.now() - gestureHoldStart : 0;
         if (this.elements.holdDuration) {
-            const hold = gestureHoldStart ? Date.now() - gestureHoldStart : 0;
-            this.elements.holdDuration.textContent = `${hold}ms`;
+            this.elements.holdDuration.textContent = `${holdDuration}ms`;
         }
 
-        // Thumb vertical
-        if (this.elements.thumbVertical) {
-            this.elements.thumbVertical.textContent = debugGeo?.thumbVertical
-                ? debugGeo.thumbVertical.toFixed(3)
-                : '-';
+        // Update gesture probability bars
+        this.updateGestureBars(debugGeo, holdDuration, currentGesture);
+    }
+
+    /**
+     * Update gesture probability bars
+     */
+    updateGestureBars(debugGeo, holdDuration, currentGesture) {
+        // Thumb Y bar - range roughly -0.2 to +0.2, center at 50%
+        const thumbBar = document.getElementById('gesture-thumb-bar');
+        const thumbValue = document.getElementById('gesture-thumb-value');
+        if (thumbBar && thumbValue && debugGeo) {
+            const thumbY = debugGeo.thumbVertical || 0;
+            // Convert to percentage (0.2 = 100%, -0.2 = 0%, 0 = 50%)
+            const thumbPct = Math.max(0, Math.min(100, (thumbY + 0.2) / 0.4 * 100));
+            thumbBar.style.width = `${thumbPct}%`;
+            thumbBar.style.background = thumbY > 0.08 ? '#22c55e' : (thumbY < -0.08 ? '#ef4444' : '#6b7280');
+            thumbValue.textContent = thumbY.toFixed(3);
         }
 
-        // Fingers curled
-        if (this.elements.fingersCurled) {
-            this.elements.fingersCurled.textContent = debugGeo?.fingersCurled
-                ? `YES (${debugGeo.curledCount}/4)`
-                : `NO (${debugGeo?.curledCount || 0}/4)`;
+        // Fingers curled bar
+        const curlBar = document.getElementById('gesture-curl-bar');
+        const curlValue = document.getElementById('gesture-curl-value');
+        if (curlBar && curlValue && debugGeo) {
+            const curled = debugGeo.curledCount || 0;
+            const curlPct = (curled / 4) * 100;
+            curlBar.style.width = `${curlPct}%`;
+            curlBar.style.background = curled >= 3 ? '#22c55e' : '#6b7280';
+            curlValue.textContent = `${curled}/4`;
+        }
+
+        // Hold progress bar
+        const holdBar = document.getElementById('gesture-hold-bar');
+        const holdValue = document.getElementById('gesture-hold-value');
+        if (holdBar && holdValue) {
+            const holdRequired = CONFIG.gestureHoldDuration || 500;
+            const holdPct = currentGesture ? Math.min(100, (holdDuration / holdRequired) * 100) : 0;
+            holdBar.style.width = `${holdPct}%`;
+            holdBar.style.background = holdPct >= 100 ? '#22c55e' : '#f59e0b';
+            holdValue.textContent = `${Math.round(holdPct)}%`;
         }
     }
 

@@ -65,15 +65,8 @@
                         <span class="debug-label">Hold:</span>
                         <span id="debug-hold-duration" class="debug-value">0ms</span>
                     </div>
-                    <div class="debug-item">
-                        <span class="debug-label">Thumb Y:</span>
-                        <span id="debug-thumb-vertical" class="debug-value">-</span>
-                    </div>
-                    <div class="debug-item">
-                        <span class="debug-label">Fingers Curled:</span>
-                        <span id="debug-fingers-curled" class="debug-value">-</span>
-                    </div>
                 </div>
+                <div id="debug-gesture-bars"></div>
 
                 <div class="debug-section-title">Music Flow</div>
                 <div class="debug-grid">
@@ -106,15 +99,32 @@
                         <span id="debug-fps" class="debug-value">-</span>
                     </div>
                 </div>
+
+                <div class="debug-section-title">Audio Test</div>
+                <div class="debug-audio-buttons">
+                    <button class="debug-btn" onclick="document.getElementById('audio-music').play()">🎵 Music</button>
+                    <button class="debug-btn" onclick="document.getElementById('audio-askmusic').play()">❓ AskMusic</button>
+                    <button class="debug-btn" onclick="document.getElementById('audio-hello').play()">👋 Hello</button>
+                    <button class="debug-btn" onclick="document.getElementById('audio-howareyou').play()">🤔 HowAreYou</button>
+                    <button class="debug-btn" onclick="document.getElementById('audio-bye').play()">👋 Bye</button>
+                    <button class="debug-btn" onclick="document.getElementById('audio-worried').play()">😟 Worried</button>
+                    <button class="debug-btn" onclick="document.querySelectorAll('audio').forEach(a => { a.pause(); a.currentTime = 0; })">⏹️ Stop All</button>
+                </div>
             </div>
         </details>
     </div>
 
     <!-- Audio Elements -->
-    <audio id="audio-music" src="assets/audio/music.mp3" preload="auto"></audio>
-    <audio id="audio-hello" src="assets/audio/hello.mp3" preload="auto"></audio>
-    <audio id="audio-bye" src="assets/audio/bye.mp3" preload="auto"></audio>
-    <audio id="audio-worried" src="assets/audio/worried.mp3" preload="auto" loop></audio>
+    <!-- Music: tries local file first, falls back to CDN if local fails -->
+    <audio id="audio-music" preload="auto">
+        <source src="assets/audio/music.mp3" type="audio/mpeg">
+        <source src="https://cdn.pixabay.com/audio/2025/04/15/audio_8a617c91e2.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="audio-askmusic" src="https://cdn.pixabay.com/audio/2025/05/29/audio_5ca2676796.mp3" preload="auto"></audio>
+    <audio id="audio-hello" src="https://cdn.pixabay.com/audio/2025/05/29/audio_145c0e7b22.mp3" preload="auto"></audio>
+    <audio id="audio-howareyou" src="https://cdn.pixabay.com/audio/2025/09/18/audio_37de472eec.mp3" preload="auto"></audio>
+    <audio id="audio-bye" src="https://cdn.pixabay.com/audio/2023/09/30/audio_b3d6b91910.mp3" preload="auto"></audio>
+    <audio id="audio-worried" src="https://cdn.pixabay.com/audio/2024/10/25/audio_66d1f8e5fd.mp3" preload="auto" loop></audio>
 
     <!-- Hidden Webcam Container (for ML processing) -->
     <div id="webcam-container" class="webcam-hidden"></div>
