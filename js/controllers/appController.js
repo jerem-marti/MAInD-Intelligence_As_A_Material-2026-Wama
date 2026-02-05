@@ -73,6 +73,9 @@ class AppController {
         this.gestureDetectionActive = false;
         this.gestureStartTime = null;
         this.wasMusicPlayingBeforeInterruption = false;
+        
+        // Wake lock to prevent screen from sleeping
+        this.wakeLock = null;
     }
 
     /**
@@ -172,6 +175,9 @@ class AppController {
             // Request fullscreen mode
             this.requestFullscreen();
             
+            // Request wake lock to keep screen on
+            await this.requestWakeLock();
+            
             // Mark that detection has been started at least once
             appState.set('detectionStartedOnce', true);
             
@@ -208,6 +214,9 @@ class AppController {
         console.log('Stopping detection...');
 
         appState.set('isRunning', false);
+        
+        // Release wake lock
+        this.releaseWakeLock();
 
         // Cancel animation frame
         if (this.animationFrameId) {
@@ -770,6 +779,49 @@ class AppController {
             elem.webkitRequestFullscreen();
         } else if (elem.msRequestFullscreen) {
             elem.msRequestFullscreen();
+        }
+    }
+
+    /**
+     * Request wake lock to prevent screen from sleeping
+     */
+    async requestWakeLock() {
+        if ('wakeLock' in navigator) {
+            try {
+                this.wakeLock = await navigator.wakeLock.request('screen');
+                console.log('Wake lock acquired - screen will stay on');
+                
+                // Re-acquire wake lock if released (e.g., when tab becomes visible again)
+                this.wakeLock.addEventListener('release', () => {
+                    console.log('Wake lock released');
+                });
+                
+                // Re-acquire on visibility change
+                document.addEventListener('visibilitychange', async () => {
+                    if (this.wakeLock !== null && document.visibilityState === 'visible' && appState.get('isRunning')) {
+                        await this.requestWakeLock();
+                    }
+                });
+            } catch (err) {
+                console.warn('Wake lock request failed:', err);
+            }
+        } else {
+            console.warn('Wake Lock API not supported');
+        }
+    }
+
+    /**
+     * Release wake lock
+     */
+    async releaseWakeLock() {
+        if (this.wakeLock) {
+            try {
+                await this.wakeLock.release();
+                this.wakeLock = null;
+                console.log('Wake lock released');
+            } catch (err) {
+                console.warn('Wake lock release failed:', err);
+            }
         }
     }
 }
