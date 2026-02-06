@@ -179,12 +179,17 @@
         height: 100vh;
         height: 100dvh;
     }
-    
-    /* Safe area insets for notched iPhones */
-    body {
+
+    /* Safe area insets for notched iPhones - only on content, not body
+       Body padding can interfere with fixed-position animation containers */
+    #page-container {
         padding-top: env(safe-area-inset-top);
         padding-bottom: env(safe-area-inset-bottom);
-        padding-left: env(safe-area-inset-left);
-        padding-right: env(safe-area-inset-right);
+        padding-left: max(var(--spacing-md), env(safe-area-inset-left));
+        padding-right: max(var(--spacing-md), env(safe-area-inset-right));
+    }
+
+    .app-header {
+        padding-top: max(var(--spacing-lg), env(safe-area-inset-top));
     }
 }

@@ -70,6 +70,7 @@ body.page-worried #lottie-container {
 body.page-worried #lottie-container svg,
 body.page-worried #lottie-container img {
     max-height: 100%;
+    max-width: 100dvw;
     width: auto;
     height: auto;
     object-fit: contain;
@@ -112,7 +113,7 @@ body.page-musicplaying #center-container {
     justify-content: flex-start;
     pointer-events: none;
     z-index: 1;
-    width: 100vw;
+    width: 100dvw;
     overflow: visible;
 }
 
@@ -124,6 +125,7 @@ body.page-musicplaying .center-content {
 
 body.page-musicplaying #center-container img.center-svg {
     max-height: 70vh;
+    max-width: 80dvw;
     width: auto;
     height: auto;
     object-fit: contain;

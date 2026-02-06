@@ -180,7 +180,7 @@ html, body {
     bottom: 0;
     left: 0;
     right: 0;
-    width: 100%;
+    width: 100dvw;
     min-height: 40vh;
     max-height: 50vh;
     display: flex;
@@ -198,9 +198,15 @@ html, body {
     pointer-events: auto;
 }
 
+/* Ensure Lottie-generated wrapper divs fill the container */
+#lottie-container > div {
+    width: 100% !important;
+    height: 100% !important;
+}
+
 #lottie-container .lottie-svg {
     max-height: 100%;
-    max-width: 100%;
+    max-width: 100dvw;
     width: auto;
     height: auto;
     object-fit: contain;
@@ -218,7 +224,7 @@ html, body {
     bottom: 0;
     left: 0;
     right: 0;
-    width: 100%;
+    width: 100dvw;
     height: 100%;
     z-index: 0;
     pointer-events: none;
