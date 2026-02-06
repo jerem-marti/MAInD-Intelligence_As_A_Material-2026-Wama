@@ -2,14 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MAInD Wama - Smart Sink Companion</title>
-    
-    <!-- iOS PWA Support for Fullscreen Mode -->
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Apple PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Wama">
-    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" href="images/icon.svg">
+    <meta name="theme-color" content="#F3F2EE">
     
     <!-- Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Proto+Mono:wght@400;500;600;700&display=swap">
@@ -25,6 +29,7 @@
     <link rel="stylesheet" href="css/pages.css">
     <link rel="stylesheet" href="css/animations.css">
     <link rel="stylesheet" href="css/debug.css">
+    <link rel="stylesheet" href="css/ios-pwa.css">
 </head>
 <body>
     <!-- Main Application Container -->
@@ -174,7 +179,79 @@
     <!-- Hidden Webcam Container (for ML processing) -->
     <div id="webcam-container" class="webcam-hidden"></div>
 
+    <!-- iOS Add to Home Screen Overlay -->
+    <div id="ios-install-overlay" class="ios-install-overlay">
+        <div class="ios-install-card">
+            <div class="icon-preview">
+                <img src="images/icon.svg" alt="Wama">
+            </div>
+            <h2>Install Wama</h2>
+            <p>Add this app to your home screen for fullscreen experience.</p>
+            <div class="ios-install-steps">
+                <div class="ios-install-step">
+                    <span class="step-number">1</span>
+                    <span class="step-icon">
+                        <svg class="ios-share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                    </span>
+                    <span class="step-text">Tap the <strong>Share</strong> button in Safari</span>
+                </div>
+                <div class="ios-install-step">
+                    <span class="step-number">2</span>
+                    <span class="step-icon">➕</span>
+                    <span class="step-text">Scroll down &amp; tap <strong>Add to Home Screen</strong></span>
+                </div>
+                <div class="ios-install-step">
+                    <span class="step-number">3</span>
+                    <span class="step-icon">✅</span>
+                    <span class="step-text">Tap <strong>Add</strong> to confirm</span>
+                </div>
+            </div>
+            <button class="ios-install-dismiss" id="ios-install-dismiss">Maybe later</button>
+        </div>
+        <div class="ios-install-arrow">
+            <svg viewBox="0 0 24 24"><path d="M12 16l-6-6h12z"/></svg>
+        </div>
+    </div>
+
     <!-- Application Modules -->
     <script type="module" src="js/main.js"></script>
+
+    <!-- Service Worker & iOS Install Prompt -->
+    <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').then(() => {
+                console.log('Service Worker registered');
+            }).catch(err => console.warn('SW registration failed:', err));
+        }
+
+        // iOS Add-to-Home-Screen prompt
+        (function() {
+            const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+            const isStandalone = window.navigator.standalone === true;
+            const dismissed = localStorage.getItem('wama-ios-install-dismissed');
+
+            if (isIOS && !isStandalone && !dismissed) {
+                const overlay = document.getElementById('ios-install-overlay');
+                const dismissBtn = document.getElementById('ios-install-dismiss');
+
+                // Show after a short delay so the page loads first
+                setTimeout(() => overlay.classList.add('visible'), 800);
+
+                dismissBtn.addEventListener('click', () => {
+                    overlay.classList.remove('visible');
+                    localStorage.setItem('wama-ios-install-dismissed', Date.now());
+                });
+
+                // Also dismiss on overlay background tap
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        overlay.classList.remove('visible');
+                        localStorage.setItem('wama-ios-install-dismissed', Date.now());
+                    }
+                });
+            }
+        })();
+    </script>
 </body>
 </html>

@@ -1,0 +1,190 @@
+/**
+ * iOS PWA - Add to Home Screen Overlay
+ */
+
+/* ============================================
+   iOS Add-to-Home-Screen Overlay
+   ============================================ */
+.ios-install-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.ios-install-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.ios-install-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 2rem 1.5rem;
+    max-width: 320px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.4s ease forwards;
+    font-family: var(--font-primary);
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(40px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.ios-install-card .icon-preview {
+    width: 72px;
+    height: 72px;
+    border-radius: 16px;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.ios-install-card .icon-preview img {
+    width: 100%;
+    height: 100%;
+}
+
+.ios-install-card h2 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+.ios-install-card p {
+    font-size: 0.82rem;
+    color: #666;
+    margin-bottom: 1.2rem;
+    line-height: 1.5;
+}
+
+/* Steps */
+.ios-install-steps {
+    text-align: left;
+    margin-bottom: 1.5rem;
+}
+
+.ios-install-step {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.ios-install-step:last-child {
+    border-bottom: none;
+}
+
+.ios-install-step .step-number {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #333;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ios-install-step .step-text {
+    font-size: 0.8rem;
+    color: #333;
+    line-height: 1.4;
+}
+
+.ios-install-step .step-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+/* Share icon inline SVG style */
+.ios-share-icon {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+    margin: 0 2px;
+}
+
+/* Dismiss button */
+.ios-install-dismiss {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 0.75rem;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    font-family: var(--font-primary);
+    letter-spacing: 0.02em;
+}
+
+.ios-install-dismiss:hover {
+    color: #333;
+}
+
+/* Arrow pointing down to Safari toolbar */
+.ios-install-arrow {
+    position: fixed;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100000;
+    animation: bounceDown 1.5s ease infinite;
+}
+
+.ios-install-arrow svg {
+    width: 32px;
+    height: 32px;
+    fill: #fff;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+@keyframes bounceDown {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+}
+
+/* PWA standalone mode adjustments */
+@media all and (display-mode: standalone) {
+    /* When running as PWA, ensure full viewport usage */
+    html, body {
+        height: 100vh;
+        height: 100dvh;
+    }
+    
+    /* Safe area insets for notched iPhones */
+    body {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+}

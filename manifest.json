@@ -1,0 +1,18 @@
+{
+    "name": "MAInD Wama - Smart Sink Companion",
+    "short_name": "Wama",
+    "description": "Smart Sink Companion Application",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#F3F2EE",
+    "theme_color": "#F3F2EE",
+    "icons": [
+        {
+            "src": "images/icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        }
+    ]
+}

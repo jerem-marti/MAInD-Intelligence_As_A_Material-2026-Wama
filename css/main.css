@@ -56,11 +56,6 @@ html, body {
     bottom: 0;
     -webkit-overflow-scrolling: touch;
     touch-action: none;
-    /* iOS safe areas for notch and home indicator */
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
 }
 
 /* App Container */
