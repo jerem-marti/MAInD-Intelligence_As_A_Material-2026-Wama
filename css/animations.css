@@ -112,26 +112,14 @@
     0% {
         transform: translateX(0) scaleX(1) scaleY(1);
     }
-    12.5% {
-        transform: translateX(calc(50vw - 50%)) scaleX(1) scaleY(0.95);
-    }
     25% {
-        transform: translateX(calc(100vw - 100%)) scaleX(1) scaleY(1);
-    }
-    37.5% {
-        transform: translateX(calc(100vw - 100%)) scaleX(-1) scaleY(0.95);
+        transform: translateX(calc(100dvw - 100%)) scaleX(1) scaleY(0.95);
     }
     50% {
-        transform: translateX(calc(100vw - 100%)) scaleX(-1) scaleY(1);
-    }
-    62.5% {
-        transform: translateX(calc(50vw - 50%)) scaleX(-1) scaleY(0.95);
+        transform: translateX(calc(100dvw - 100%)) scaleX(-1) scaleY(1);
     }
     75% {
-        transform: translateX(0) scaleX(-1) scaleY(1);
-    }
-    87.5% {
-        transform: translateX(0) scaleX(1) scaleY(0.95);
+        transform: translateX(0) scaleX(-1) scaleY(0.95);
     }
     100% {
         transform: translateX(0) scaleX(1) scaleY(1);
