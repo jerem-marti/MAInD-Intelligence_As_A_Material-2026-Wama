@@ -51,7 +51,10 @@ class AppState {
 
             // UI State
             currentRoute: null,
-            currentAnimation: null
+            currentAnimation: null,
+
+            // Debug modes
+            gestureTestMode: false
         };
     }
 

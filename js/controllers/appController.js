@@ -417,12 +417,92 @@ class AppController {
     }
 
     /**
+     * Toggle gesture test mode
+     */
+    toggleGestureTestMode(enabled) {
+        appState.set('gestureTestMode', enabled);
+        console.log(`Gesture Test Mode: ${enabled ? 'ENABLED' : 'DISABLED'}`);
+        
+        const resultEl = document.getElementById('gesture-test-result');
+        if (resultEl) {
+            resultEl.style.display = enabled ? 'block' : 'none';
+        }
+        
+        if (enabled) {
+            // Reset gesture state for clean testing
+            gestureDetector.resetHold();
+            appState.set('confirmedGesture', null);
+        }
+    }
+
+    /**
+     * Update gesture test display
+     */
+    updateGestureTestDisplay() {
+        const iconEl = document.getElementById('gesture-test-icon');
+        const labelEl = document.getElementById('gesture-test-label');
+        if (!iconEl || !labelEl) return;
+
+        const handLandmarks = appState.get('handLandmarks');
+        const currentGesture = appState.get('currentGesture');
+        const gestureHoldStart = appState.get('gestureHoldStart');
+        const holdDuration = gestureHoldStart ? Date.now() - gestureHoldStart : 0;
+        const holdRequired = CONFIG.gestureHoldDuration || 500;
+        const holdPct = currentGesture ? Math.min(100, (holdDuration / holdRequired) * 100) : 0;
+
+        if (!handLandmarks) {
+            iconEl.textContent = '🖐️';
+            iconEl.className = 'gesture-test-icon';
+            labelEl.textContent = 'No hand detected';
+        } else if (currentGesture === GESTURES.YES) {
+            iconEl.textContent = '👍';
+            iconEl.className = 'gesture-test-icon thumbs-up';
+            labelEl.textContent = holdPct >= 100 ? 'THUMBS UP CONFIRMED!' : `Thumbs Up (${Math.round(holdPct)}%)`;
+        } else if (currentGesture === GESTURES.NO) {
+            iconEl.textContent = '👎';
+            iconEl.className = 'gesture-test-icon thumbs-down';
+            labelEl.textContent = holdPct >= 100 ? 'THUMBS DOWN CONFIRMED!' : `Thumbs Down (${Math.round(holdPct)}%)`;
+        } else {
+            iconEl.textContent = '✋';
+            iconEl.className = 'gesture-test-icon';
+            labelEl.textContent = 'Hand detected - make a gesture';
+        }
+    }
+
+    /**
      * Main prediction loop
      */
     async runPredictionLoop() {
         if (!appState.get('isRunning')) return;
 
         const now = Date.now();
+
+        // Check if gesture test mode is active (takes priority)
+        if (appState.get('gestureTestMode')) {
+            // Only run gesture detection, pause everything else
+            stateDetector.updateFrame();
+            
+            const webcam = appState.get('webcam');
+            if (webcam) {
+                await gestureDetector.processFrame(webcam.canvas);
+                
+                if (appState.get('handLandmarks')) {
+                    const result = gestureDetector.detectGesture();
+                    gestureDetector.handleGestureResult(result);
+                } else {
+                    gestureDetector.resetHold();
+                }
+            }
+
+            // Update displays
+            this.updateGestureTestDisplay();
+            debugPanel.updateGestureInfo();
+            this.updateFPS(now);
+
+            // Request next frame
+            this.animationFrameId = requestAnimationFrame(() => this.runPredictionLoop());
+            return;
+        }
 
         // Check if simulation mode is active
         if (debugSimulation.isEnabled()) {

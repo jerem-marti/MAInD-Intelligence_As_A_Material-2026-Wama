@@ -112,6 +112,20 @@
                     <button class="debug-btn" onclick="document.querySelectorAll('audio').forEach(a => { a.pause(); a.currentTime = 0; })">⏹️ Stop All</button>
                 </div>
 
+                <div class="debug-section-title">🖐️ Gesture Test Mode</div>
+                <div class="debug-grid">
+                    <div class="debug-item" style="grid-column: span 2;">
+                        <label>
+                            <input type="checkbox" id="debug-gesture-test-mode" onchange="window.appController?.toggleGestureTestMode(this.checked)">
+                            <span class="debug-label">Enable Gesture Test (Pause Flow)</span>
+                        </label>
+                    </div>
+                </div>
+                <div id="gesture-test-result" class="gesture-test-result" style="display: none;">
+                    <div class="gesture-test-icon" id="gesture-test-icon">🖐️</div>
+                    <div class="gesture-test-label" id="gesture-test-label">Waiting for gesture...</div>
+                </div>
+
                 <div class="debug-section-title">🎮 Simulation Mode</div>
                 <div class="debug-grid">
                     <div class="debug-item" style="grid-column: span 2;">

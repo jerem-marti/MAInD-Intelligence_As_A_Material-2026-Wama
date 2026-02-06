@@ -42,3 +42,6 @@ document.addEventListener('visibilitychange', () => {
 window.MAInDWama = {
     appController
 };
+
+// Expose appController for debug panel onclick handlers
+window.appController = appController;
