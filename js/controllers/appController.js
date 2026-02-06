@@ -847,9 +847,15 @@ class AppController {
 
     /**
      * Request fullscreen mode
+     * Note: iOS Safari doesn't support the Fullscreen API.
+     * For iOS, we use PWA meta tags and scroll tricks to maximize screen usage.
      */
     requestFullscreen() {
         const elem = document.documentElement;
+        
+        // Check if running as iOS PWA (standalone mode)
+        const isIOSPWA = window.navigator.standalone === true;
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         
         if (elem.requestFullscreen) {
             elem.requestFullscreen().catch(err => {
@@ -859,7 +865,26 @@ class AppController {
             elem.webkitRequestFullscreen();
         } else if (elem.msRequestFullscreen) {
             elem.msRequestFullscreen();
+        } else if (isIOS && !isIOSPWA) {
+            // iOS Safari fallback: scroll to hide address bar
+            this.iosFullscreenWorkaround();
         }
+    }
+
+    /**
+     * iOS Safari workaround to minimize browser chrome
+     * Scrolls to hide the address bar and locks scroll position
+     */
+    iosFullscreenWorkaround() {
+        // Temporarily enable scroll to trigger address bar hide
+        document.body.style.height = '100.1vh';
+        window.scrollTo(0, 1);
+        
+        // Reset after a brief moment
+        setTimeout(() => {
+            document.body.style.height = '100dvh';
+            window.scrollTo(0, 0);
+        }, 100);
     }
 
     /**
