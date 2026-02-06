@@ -109,30 +109,47 @@
    Dancing Walk Animation (Edge to Edge with Dance)
    ========================================================================== */
 @keyframes dancing-walk {
+    /* Start: left edge, facing right */
     0% {
         transform: translateX(0) scaleX(1) scaleY(1);
     }
-    12.5% {
-        transform: translateX(calc(50vw - 50%)) scaleX(1) scaleY(0.95);
+    /* Bounce while walking right */
+    10% {
+        transform: translateX(calc((100vw - 100%) * 0.4)) scaleX(1) scaleY(0.92);
     }
+    /* Arrive at right edge */
     25% {
         transform: translateX(calc(100vw - 100%)) scaleX(1) scaleY(1);
     }
-    37.5% {
-        transform: translateX(calc(100vw - 100%)) scaleX(-1) scaleY(0.95);
+    /* Flip direction at right edge */
+    25.01% {
+        transform: translateX(calc(100vw - 100%)) scaleX(-1) scaleY(1);
     }
+    /* Bounce at right edge */
+    40% {
+        transform: translateX(calc(100vw - 100%)) scaleX(-1) scaleY(0.92);
+    }
+    /* Ready to walk left */
     50% {
         transform: translateX(calc(100vw - 100%)) scaleX(-1) scaleY(1);
     }
-    62.5% {
-        transform: translateX(calc(50vw - 50%)) scaleX(-1) scaleY(0.95);
+    /* Bounce while walking left */
+    60% {
+        transform: translateX(calc((100vw - 100%) * 0.6)) scaleX(-1) scaleY(0.92);
     }
+    /* Arrive at left edge */
     75% {
         transform: translateX(0) scaleX(-1) scaleY(1);
     }
-    87.5% {
-        transform: translateX(0) scaleX(1) scaleY(0.95);
+    /* Flip direction at left edge */
+    75.01% {
+        transform: translateX(0) scaleX(1) scaleY(1);
     }
+    /* Bounce at left edge */
+    90% {
+        transform: translateX(0) scaleX(1) scaleY(0.92);
+    }
+    /* Back to start */
     100% {
         transform: translateX(0) scaleX(1) scaleY(1);
     }

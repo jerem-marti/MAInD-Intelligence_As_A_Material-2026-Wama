@@ -55,6 +55,29 @@ body.page-worried .page-nav {
     z-index: 9999;
 }
 
+body.page-worried #page-container {
+    overflow: hidden;
+}
+
+body.page-worried #page-container::before {
+    content: '';
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 70dvh;
+    background: linear-gradient(
+        to bottom,
+        rgba(173, 216, 230, 0) 0%,
+        rgba(173, 216, 230, 0.3) 20%,
+        rgba(100, 180, 220, 0.6) 50%,
+        rgba(70, 150, 200, 0.85) 80%,
+        rgba(50, 130, 180, 1) 100%
+    );
+    z-index: 0;
+    pointer-events: none;
+}
+
 body.page-worried #lottie-container {
     justify-content: flex-start;
     height: 70dvh;
@@ -65,6 +88,7 @@ body.page-worried #lottie-container {
     bottom: 0;
     left: 0;
     transform: none;
+    overflow: hidden;
 }
 
 body.page-worried #lottie-container svg,
